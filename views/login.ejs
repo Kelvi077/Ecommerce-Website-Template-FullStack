@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Aurora Home Furniture</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Aurora Home</h1>
+                </div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="cart-icon">
+                    <a href="/cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="mobile-menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a></li>
+        </ul>
+    </div>
+
+    <section class="auth-hero">
+        <div class="container">
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your account, view orders, and enjoy a personalized shopping experience</p>
+        </div>
+    </section>
+
+    <section class="auth-container">
+        <div class="container">
+            <div class="auth-wrapper">
+                <div class="auth-form-container">
+                    <div class="auth-tabs">
+                        <button class="tab-btn active" data-target="login">Login</button>
+                        <button class="tab-btn" data-target="register">Register</button>
+                    </div>
+                    
+                    <div id="login" class="auth-form active">
+                        <h2>Login to Your Account</h2>
+                        <div class="auth-message" id="login-message"></div>
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="login-email">Email Address</label>
+                                <input type="email" id="login-email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" name="password" required>
+                            </div>
+                            <div class="form-group remember-forgot">
+                                <div class="remember-me">
+                                    <input type="checkbox" id="remember" name="remember">
+                                    <label for="remember">Remember me</label>
+                                </div>
+                                <a href="/forgot-password" class="forgot-password">Forgot Password?</a>
+                            </div>
+                            <button type="submit" class="auth-button">Login</button>
+                        </form>
+                    </div>
+                    
+                    <div id="register" class="auth-form">
+                        <h2>Create an Account</h2>
+                        <div class="auth-message" id="register-message"></div>
+                        <form id="register-form">
+                            <div class="form-group">
+                                <label for="register-name">Full Name</label>
+                                <input type="text" id="register-name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">Email Address</label>
+                                <input type="email" id="register-email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">Password</label>
+                                <input type="password" id="register-password" name="password" required>
+                                <small class="password-requirements">
+                                    Password must be at least 8 characters long and include a number and a special character.
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-confirm-password">Confirm Password</label>
+                                <input type="password" id="register-confirm-password" name="confirmPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms">I agree to the <a href="/terms">Terms & Conditions</a> and <a href="/privacy">Privacy Policy</a></label>
+                            </div>
+                            <button type="submit" class="auth-button">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="auth-info">
+                    <div class="auth-benefits">
+                        <h3>Benefits of Creating an Account</h3>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Track your orders and view order history</li>
+                            <li><i class="fas fa-check"></i> Save items to your wishlist</li>
+                            <li><i class="fas fa-check"></i> Receive exclusive offers and promotions</li>
+                            <li><i class="fas fa-check"></i> Faster checkout with saved shipping details</li>
+                            <li><i class="fas fa-check"></i> Get personalized product recommendations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Aurora Home</h3>
+                    <p>Creating beautiful living spaces since 2010. Our furniture combines modern design with exceptional craftsmanship.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/products">Shop</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Customer Care</h3>
+                    <ul>
+                        <li><a href="#">Shipping & Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Furniture Lane, Design District</li>
+                        <li><i class="fas fa-phone"></i> (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@aurorahome.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Aurora Home Furniture. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | Aurora Home Furniture</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Aurora Home</h1>
+                </div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/products" class="active">Products</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="cart-icon">
+                    <a href="/cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="mobile-menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/products" class="active">Products</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a></li>
+        </ul>
+    </div>
+
+    <section class="products-hero">
+        <div class="container">
+            <h1>Our Collection</h1>
+            <p>Discover handcrafted furniture designed for style, comfort, and durability</p>
+        </div>
+    </section>
+
+    <section class="product-filters">
+        <div class="container">
+            <div class="filter-container">
+                <div class="filter-options">
+                    <select id="category-filter" class="filter-select">
+                        <option value="all">All Categories</option>
+                        <option value="living-room">Living Room</option>
+                        <option value="dining-room">Dining Room</option>
+                        <option value="bedroom">Bedroom</option>
+                    </select>
+                    <select id="price-filter" class="filter-select">
+                        <option value="all">All Prices</option>
+                        <option value="under-500">Under $500</option>
+                        <option value="500-1000">$500 - $1000</option>
+                        <option value="1000-2000">$1000 - $2000</option>
+                        <option value="over-2000">Over $2000</option>
+                    </select>
+                    <select id="sort-filter" class="filter-select">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+                <div class="search-filter">
+                    <input type="text" id="search-input" placeholder="Search products...">
+                    <button id="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="product-navigation">
+        <div class="container">
+            <div class="product-nav-tabs">
+                <button class="tab-btn active" data-target="all">All Products</button>
+                <button class="tab-btn" data-target="living-room">Living Room</button>
+                <button class="tab-btn" data-target="dining-room">Dining Room</button>
+                <button class="tab-btn" data-target="bedroom">Bedroom</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Living Room Section -->
+    <section id="living-room" class="product-section">
+        <div class="container">
+            <h2 class="section-title">Living Room</h2>
+            <p class="section-subtitle">Create a welcoming space with our stylish and comfortable living room furniture</p>
+            
+            <div class="products-grid">
+                <% if (products && products.filter(product => product.category === "Living-room").length > 0) { %>
+                    <% products.filter(product => product.category === "Living-room").forEach(product => { %>
+                        <div class="product-card" data-category="<%= product.category %>" data-price="<%= product.price %>">
+                            <div class="product-image">
+                                <img src="/images/<%= product.image %>" alt="<%= product.name %>">
+                                <% if (product.stock <= 0) { %>
+                                    <div class="product-badge out-of-stock">Out of Stock</div>
+                                <% } else if (product.stock <= 5) { %>
+                                    <div class="product-badge low-stock">Low Stock</div>
+                                <% } %>
+                                <div class="product-actions">
+                                    <button class="quick-view-btn" data-id="<%= product.id %>">Quick View</button>
+                                    <button class="add-to-cart-btn" 
+                                        data-id="<%= product.id %>" 
+                                        data-name="<%= product.name %>" 
+                                        data-price="<%= product.price %>" 
+                                        data-image="<%= product.image %>" 
+                                        data-category="<%= product.category %>"
+                                        <%= product.stock <= 0 ? 'disabled' : '' %>>
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title"><%= product.name %></h3>
+                                <p class="product-category"><%= product.category %></p>
+                                <p class="product-price">$<%= typeof product.price === 'number' ? product.price.toFixed(2) : Number(product.price).toFixed(2) %></p>
+                            </div>
+                            <div class="product-description" style="display: none;"><%= product.description %></div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="no-products-message">
+                        <p>No living room products available at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dining Room Section -->
+    <section id="dining-room" class="product-section">
+        <div class="container">
+            <h2 class="section-title">Dining Room</h2>
+            <p class="section-subtitle">Elegant dining furniture for memorable meals and gatherings</p>
+            
+            <div class="products-grid">
+                <% if (products && products.filter(product => product.category === "Dining-room").length > 0) { %>
+                    <% products.filter(product => product.category === "Dining-room").forEach(product => { %>
+                        <div class="product-card" data-category="<%= product.category %>" data-price="<%= product.price %>">
+                            <div class="product-image">
+                                <img src="/images/<%= product.image %>" alt="<%= product.name %>">
+                                <% if (product.stock <= 0) { %>
+                                    <div class="product-badge out-of-stock">Out of Stock</div>
+                                <% } else if (product.stock <= 5) { %>
+                                    <div class="product-badge low-stock">Low Stock</div>
+                                <% } %>
+                                <div class="product-actions">
+                                    <button class="quick-view-btn" data-id="<%= product.id %>">Quick View</button>
+                                    <button class="add-to-cart-btn" 
+                                        data-id="<%= product.id %>" 
+                                        data-name="<%= product.name %>" 
+                                        data-price="<%= product.price %>" 
+                                        data-image="<%= product.image %>" 
+                                        data-category="<%= product.category %>"
+                                        <%= product.stock <= 0 ? 'disabled' : '' %>>
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title"><%= product.name %></h3>
+                                <p class="product-category"><%= product.category %></p>
+                                <p class="product-price">$<%= typeof product.price === 'number' ? product.price.toFixed(2) : Number(product.price).toFixed(2) %></p>
+                            </div>
+                            <div class="product-description" style="display: none;"><%= product.description %></div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="no-products-message">
+                        <p>No dining room products available at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bedroom Section -->
+    <section id="bedroom" class="product-section">
+        <div class="container">
+            <h2 class="section-title">Bedroom</h2>
+            <p class="section-subtitle">Create a tranquil retreat with our beautiful bedroom furniture</p>
+            
+            <div class="products-grid">
+                <% if (products && products.filter(product => product.category === "Bedroom").length > 0) { %>
+                    <% products.filter(product => product.category === "Bedroom").forEach(product => { %>
+                        <div class="product-card" data-category="<%= product.category %>" data-price="<%= product.price %>">
+                            <div class="product-image">
+                                <img src="/images/<%= product.image %>" alt="<%= product.name %>">
+                                <% if (product.stock <= 0) { %>
+                                    <div class="product-badge out-of-stock">Out of Stock</div>
+                                <% } else if (product.stock <= 5) { %>
+                                    <div class="product-badge low-stock">Low Stock</div>
+                                <% } %>
+                                <div class="product-actions">
+                                    <button class="quick-view-btn" data-id="<%= product.id %>">Quick View</button>
+                                    <button class="add-to-cart-btn" 
+                                        data-id="<%= product.id %>" 
+                                        data-name="<%= product.name %>" 
+                                        data-price="<%= product.price %>" 
+                                        data-image="<%= product.image %>" 
+                                        data-category="<%= product.category %>"
+                                        <%= product.stock <= 0 ? 'disabled' : '' %>>
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title"><%= product.name %></h3>
+                                <p class="product-category"><%= product.category %></p>
+                                <p class="product-price">$<%= typeof product.price === 'number' ? product.price.toFixed(2) : Number(product.price).toFixed(2) %></p>
+                            </div>
+                            <div class="product-description" style="display: none;"><%= product.description %></div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="no-products-message">
+                        <p>No bedroom products available at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick view modal -->
+    <div class="quick-view-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-product-content">
+                <!-- Product details will be loaded here via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart notification -->
+    <div class="cart-notification">
+        <p>Item added to cart!</p>
+    </div>
+    
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Join Our Mailing List</h2>
+                <p>Be the first to know about new arrivals, exclusive offers, and interior design tips.</p>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit" class="subscribe-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Aurora Home</h3>
+                    <p>Creating beautiful living spaces since 2010. Our furniture combines modern design with exceptional craftsmanship.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/products">Shop</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Customer Care</h3>
+                    <ul>
+                        <li><a href="#">Shipping & Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Furniture Lane, Design District</li>
+                        <li><i class="fas fa-phone"></i> (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@aurorahome.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Aurora Home Furniture. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/products.js"></script>
+</body>
+</html>

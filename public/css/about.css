@@ -1,0 +1,426 @@
+/* This should be saved as about.css in your CSS directory */
+
+/* Page Header */
+.page-header {
+  background-color: var(--color-light-beige);
+  padding: 60px 0;
+  text-align: center;
+}
+
+.page-header h1 {
+  font-family: var(--font-primary);
+  font-size: 42px;
+  color: var(--color-dark-brown);
+  margin-bottom: 10px;
+}
+
+.page-header p {
+  font-size: 18px;
+  color: var(--color-medium-grey);
+}
+
+/* About Intro Section */
+.about-intro {
+  padding: 80px 0;
+  background-color: var(--color-white);
+}
+
+.about-intro-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.about-intro-image {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
+}
+
+.about-intro-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.about-intro-image:hover img {
+  transform: scale(1.03);
+}
+
+.about-intro-text h2 {
+  font-family: var(--font-primary);
+  font-size: 32px;
+  color: var(--color-dark-brown);
+  margin-bottom: 20px;
+}
+
+.about-intro-text p {
+  font-size: 16px;
+  color: var(--color-medium-grey);
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+
+.signature {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.signature img {
+  height: 60px;
+  opacity: 0.9;
+}
+
+.signature p {
+  font-family: var(--font-primary);
+  font-style: italic;
+  color: var(--color-dark-grey);
+  margin-bottom: 0;
+}
+
+/* Our Values Section */
+.our-values {
+  padding: 80px 0;
+  background-color: var(--color-light-grey);
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.value-card {
+  background-color: var(--color-white);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.value-card:hover {
+  transform: translateY(-10px);
+}
+
+.value-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: var(--color-pale-peach);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.value-icon i {
+  font-size: 26px;
+  color: var(--color-dark-brown);
+}
+
+.value-card h3 {
+  font-family: var(--font-primary);
+  font-size: 20px;
+  color: var(--color-dark-brown);
+  margin-bottom: 15px;
+}
+
+.value-card p {
+  font-size: 15px;
+  color: var(--color-medium-grey);
+  line-height: 1.6;
+}
+
+/* Our Process Section */
+.our-process {
+  padding: 80px 0;
+  background-color: var(--color-white);
+}
+
+.process-timeline {
+  max-width: 800px;
+  margin: 50px auto 0;
+  position: relative;
+}
+
+.process-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 30px;
+  width: 2px;
+  background-color: var(--color-light-beige);
+}
+
+.process-step {
+  position: relative;
+  padding-left: 80px;
+  margin-bottom: 40px;
+}
+
+.process-step:last-child {
+  margin-bottom: 0;
+}
+
+.step-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-mauve);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-primary);
+  font-size: 24px;
+  z-index: 1;
+}
+
+.step-content h3 {
+  font-family: var(--font-primary);
+  font-size: 22px;
+  color: var(--color-dark-brown);
+  margin-bottom: 10px;
+}
+
+.step-content p {
+  font-size: 16px;
+  color: var(--color-medium-grey);
+  line-height: 1.6;
+}
+
+/* Team Section */
+.team {
+  padding: 80px 0;
+  background-color: var(--color-light-beige);
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.team-member {
+  background-color: var(--color-white);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.team-member:hover {
+  transform: translateY(-10px);
+}
+
+.member-image {
+  height: 280px;
+  overflow: hidden;
+}
+
+.member-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.team-member:hover .member-image img {
+  transform: scale(1.05);
+}
+
+.team-member h3 {
+  font-family: var(--font-primary);
+  font-size: 20px;
+  color: var(--color-dark-brown);
+  margin: 20px 0 5px;
+  padding: 0 15px;
+}
+
+.member-title {
+  font-size: 14px;
+  color: var(--color-medium-grey);
+  margin-bottom: 20px;
+  padding: 0 15px;
+}
+
+/* Testimonials Section */
+.testimonials {
+  padding: 80px 0;
+  background-color: var(--color-white);
+}
+
+.testimonials-slider {
+  max-width: 800px;
+  margin: 50px auto 0;
+  position: relative;
+  height: 250px;
+}
+
+.testimonial {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  text-align: center;
+  padding: 0 30px;
+  transition: opacity 0.5s ease;
+}
+
+.testimonial.active {
+  opacity: 1;
+}
+
+.quote-icon {
+  font-size: 36px;
+  color: var(--color-mauve);
+  opacity: 0.6;
+  margin-bottom: 20px;
+}
+
+.testimonial-text {
+  font-size: 18px;
+  color: var(--color-dark-grey);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.author-name {
+  font-family: var(--font-primary);
+  font-size: 18px;
+  color: var(--color-dark-brown);
+  margin-bottom: 5px;
+}
+
+.author-location {
+  font-size: 14px;
+  color: var(--color-medium-grey);
+}
+
+.testimonial-controls {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.testimonial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-light-beige);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dot.active {
+  background-color: var(--color-mauve);
+  width: 20px;
+  border-radius: 10px;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 992px) {
+  .page-header {
+    padding: 50px 0;
+  }
+
+  .page-header h1 {
+    font-size: 36px;
+  }
+
+  .about-intro-image {
+    height: 400px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .about-intro-content {
+    grid-template-columns: 1fr;
+  }
+
+  .about-intro-image {
+    height: 350px;
+    margin-bottom: 30px;
+  }
+
+  .page-header {
+    padding: 40px 0;
+  }
+
+  .page-header h1 {
+    font-size: 32px;
+  }
+
+  .page-header p {
+    font-size: 16px;
+  }
+
+  .testimonial-text {
+    font-size: 16px;
+  }
+
+  .process-timeline::before {
+    left: 20px;
+  }
+
+  .process-step {
+    padding-left: 60px;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .about-intro {
+    padding: 60px 0;
+  }
+
+  .about-intro-image {
+    height: 300px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .about-intro-text h2 {
+    font-size: 26px;
+  }
+
+  .value-card {
+    padding: 20px;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .testimonials-slider {
+    height: 320px;
+  }
+}

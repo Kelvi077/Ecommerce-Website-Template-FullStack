@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script defer src="/js/admin.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Admin Dashboard Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1>Furniture Admin</h1>
+      </div>
+      <a href="/admin/logout" class="logout-btn">Logout</a>
+    </header>
+    
+    <!-- Sidebar -->
+    <nav class="admin-sidebar" id="sidebar">
+      <div class="logo-container">
+        <div class="logo">
+          <i class="fas fa-couch" style="margin-right: 10px; color: var(--color-medium-brown);"></i>
+          Aurora Home
+        </div>
+      </div>
+      <ul>
+        <li><a href="/admin/dashboard" class="active" >Dashboard</a></li>
+        <li><a href="/admin/orders">Orders</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Statistics Section -->
+      <div class="stats-container">
+        <div class="stat-card product-count">
+          <div class="stat-icon">
+            <i class="fas fa-couch"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Total Products</h3>
+            <p id="total-product-count">0</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Add Product Form -->
+      <section class="product-form">
+        <h2>Add New Furniture</h2>
+        <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Product Name:</label>
+                <input type="text" id="name" name="name" placeholder="e.g. Modern Sofa" required>
+              </div>
+              <div class="form-group">
+                <label for="price">Price ($):</label>
+                <input type="number" id="price" name="price" placeholder="e.g. 599" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category">Category:</label>
+                <input type="text" id="category" name="category" placeholder="Living-room / Bedroom / Dining-room / Featured" required>
+              </div>
+              <div class="form-group">
+                <label for="stock">Stock Quantity:</label>
+                <input type="number" id="stock" name="stock" placeholder="e.g. 10" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="description">Description:</label>
+              <input type="text" id="description" name="description" placeholder="Brief product description" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="image">Product Image:</label>
+              <input type="file" id="image" name="image" accept="image/*" required>
+            </div>
+            
+            <button type="submit" class="btn submit-btn">Add Product</button>
+          </form>          
+      </section>
+
+      <!-- Product Categories Section -->
+      <section class="product-categories">
+        <h2>Products by Category</h2>
+        
+        <!-- Featured Products -->
+        <br>
+        <div class="category-section">
+          <h3>Featured Products</h3>
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% 
+              const featuredProducts = products.filter(product => 
+                product.category.toLowerCase() === 'featured');
+              
+              if (featuredProducts.length > 0) {
+                featuredProducts.forEach(product => { %>
+                  <tr>
+                    <td><img src="/images/<%= product.image %>" alt="<%= product.name %>" class="product-image" style="max-width: 80px;"></td>
+                    <td><%= product.name %></td>
+                    <td>$<%= product.price %></td>
+                    <td><%= product.stock %></td>
+                    <td>
+                      <button class="btn delete-btn" data-id="<%= product.id %>">Delete</button>
+                    </td>
+                  </tr>
+                <% });
+              } else { %>
+                <tr>
+                  <td colspan="5" class="no-products">No featured products available</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Living Room Products -->
+        <br>
+        <div class="category-section">
+          <h3>Living Room Products</h3>
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% 
+              const livingRoomProducts = products.filter(product => 
+                product.category.toLowerCase() === 'living-room' || 
+                product.category.toLowerCase() === 'livingroom');
+              
+              if (livingRoomProducts.length > 0) {
+                livingRoomProducts.forEach(product => { %>
+                  <tr>
+                    <td><img src="/images/<%= product.image %>" alt="<%= product.name %>" class="product-image" style="max-width: 80px;"></td>
+                    <td><%= product.name %></td>
+                    <td>$<%= product.price %></td>
+                    <td><%= product.stock %></td>
+                    <td>
+                      <button class="btn delete-btn" data-id="<%= product.id %>">Delete</button>
+                    </td>
+                  </tr>
+                <% });
+              } else { %>
+                <tr>
+                  <td colspan="5" class="no-products">No living room products available</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Bedroom Products -->
+        <br>
+        <div class="category-section">
+          <h3>Bedroom Products</h3>
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% 
+              const bedroomProducts = products.filter(product => 
+                product.category.toLowerCase() === 'bedroom');
+              
+              if (bedroomProducts.length > 0) {
+                bedroomProducts.forEach(product => { %>
+                  <tr>
+                    <td><img src="/images/<%= product.image %>" alt="<%= product.name %>" class="product-image" style="max-width: 80px;"></td>
+                    <td><%= product.name %></td>
+                    <td>$<%= product.price %></td>
+                    <td><%= product.stock %></td>
+                    <td>
+                      <button class="btn delete-btn" data-id="<%= product.id %>">Delete</button>
+                    </td>
+                  </tr>
+                <% });
+              } else { %>
+                <tr>
+                  <td colspan="5" class="no-products">No bedroom products available</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <!-- Dining Room Products -->
+        <br>
+        <div class="category-section">
+          <h3>Dining Room Products</h3>
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% 
+              const diningRoomProducts = products.filter(product => 
+                product.category.toLowerCase() === 'dining-room' || 
+                product.category.toLowerCase() === 'diningroom');
+              
+              if (diningRoomProducts.length > 0) {
+                diningRoomProducts.forEach(product => { %>
+                  <tr>
+                    <td><img src="/images/<%= product.image %>" alt="<%= product.name %>" class="product-image" style="max-width: 80px;"></td>
+                    <td><%= product.name %></td>
+                    <td>$<%= product.price %></td>
+                    <td><%= product.stock %></td>
+                    <td>
+                      <button class="btn delete-btn" data-id="<%= product.id %>">Delete</button>
+                    </td>
+                  </tr>
+                <% });
+              } else { %>
+                <tr>
+                  <td colspan="5" class="no-products">No dining room products available</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

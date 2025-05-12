@@ -1,0 +1,275 @@
+/* Authentication Pages Styling */
+.auth-hero {
+    background-color: #f8f5f2;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.auth-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.auth-hero p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.1rem;
+    color: #5d6d7e;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.auth-container {
+    padding: 60px 0;
+}
+
+.auth-wrapper {
+    display: flex;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 0;
+}
+
+.auth-form-container {
+    flex: 1;
+    padding: 40px;
+}
+
+.auth-info {
+    flex: 1;
+    background-color: #f8f5f2;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.tab-btn:after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: #2c3e50;
+    transition: width 0.3s;
+}
+
+.tab-btn.active {
+    color: #2c3e50;
+}
+
+.tab-btn.active:after {
+    width: 100%;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.auth-form h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #7f8c8d;
+    outline: none;
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 8px;
+}
+
+.forgot-password {
+    color: #34495e;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: #2c3e50;
+    text-decoration: underline;
+}
+
+.auth-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.auth-button:hover {
+    background-color: #1a2a3a;
+}
+
+.password-requirements {
+    display: block;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-top: 8px;
+}
+
+.auth-benefits {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.auth-benefits h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.auth-benefits ul {
+    list-style: none;
+    padding: 0;
+}
+
+.auth-benefits li {
+    font-family: 'Raleway', sans-serif;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.auth-benefits li i {
+    color: #2ecc71;
+    margin-right: 10px;
+    font-size: 1rem;
+    margin-top: 3px;
+}
+
+.auth-message {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.auth-message.error {
+    display: block;
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.auth-message.success {
+    display: block;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+/* For checkbox styling */
+input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+    .auth-wrapper {
+        flex-direction: column;
+    }
+    
+    .auth-info {
+        order: -1;
+    }
+    
+    .auth-hero {
+        padding: 60px 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-form-container,
+    .auth-info {
+        padding: 30px 20px;
+    }
+    
+    .tab-btn {
+        padding: 15px 20px;
+    }
+}
