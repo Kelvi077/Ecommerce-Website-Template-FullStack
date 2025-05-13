@@ -42,6 +42,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Check for redirect parameter and show appropriate message
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirect = urlParams.get("redirect");
+  const action = urlParams.get("action");
+
+  if (action === "required") {
+    showInfo("login-message", "Please log in to add items to your cart.");
+  }
+
   // -------------------- Form Validation Functions --------------------
 
   /**
@@ -74,6 +83,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById(containerId);
     container.textContent = message;
     container.classList.add("error");
+    container.classList.remove("info", "success");
+    container.style.display = "block";
+  }
+
+  /**
+   * Displays an info message in the specified message container
+   * @param {string} containerId - ID of the message container
+   * @param {string} message - Info message to display
+   */
+  function showInfo(containerId, message) {
+    const container = document.getElementById(containerId);
+    container.textContent = message;
+    container.classList.add("info");
+    container.classList.remove("error", "success");
     container.style.display = "block";
   }
 
@@ -85,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function showSuccess(containerId, message) {
     const container = document.getElementById(containerId);
     container.textContent = message;
-    container.classList.remove("error");
+    container.classList.remove("error", "info");
     container.classList.add("success");
     container.style.display = "block";
   }
@@ -98,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById(containerId);
     container.textContent = "";
     container.style.display = "none";
-    container.classList.remove("error", "success");
+    container.classList.remove("error", "success", "info");
   }
 
   // -------------------- Login Form Handling --------------------
@@ -150,9 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Redirect to homepage or previous page after successful login
             setTimeout(() => {
-              const redirectUrl =
-                new URLSearchParams(window.location.search).get("redirect") ||
-                "/";
+              const redirectUrl = urlParams.get("redirect") || "/";
               window.location.href = redirectUrl;
             }, 1500);
           } else {
@@ -286,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h2>Welcome back, ${data.user.name}!</h2>
                 <p>You are currently logged in.</p>
                 <div class="user-actions">
-                  <a href="/" class="auth-button">Go to Home</a>
+                  <a href="${redirect || "/"}" class="auth-button">Return to Shopping</a>
                   <a href="/profile" class="auth-button">My Profile</a>
                   <button id="logout-btn" class="auth-button secondary">Log Out</button>
                 </div>
@@ -333,3 +354,22 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize cart count on page load
   updateCartCount();
 });
+
+// Check if user is logged in
+let userLoggedIn = false;
+
+function checkAuthStatus() {
+  fetch("/api/auth/check")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        userLoggedIn = data.loggedIn;
+
+        // Update login/account link in header
+        updateHeaderLoginState(data.loggedIn, data.user);
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking auth status:", error);
+    });
+}

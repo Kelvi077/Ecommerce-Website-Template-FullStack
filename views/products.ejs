@@ -12,32 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <h1>Aurora Home</h1>
-                </div>
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/about">About</a></li>
-                        <li><a href="/products" class="active">Products</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                    </ul>
-                </nav>
-                <div class="cart-icon">
-                    <a href="/cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </a>
-                </div>
-                <div class="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </div>
-            </div>
-        </div>
-    </header>
+    <%- include('./partials/header.ejs') %>
+
 
     <div class="mobile-menu">
         <ul>
@@ -268,55 +244,11 @@
         </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>Aurora Home</h3>
-                    <p>Creating beautiful living spaces since 2010. Our furniture combines modern design with exceptional craftsmanship.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/about">About Us</a></li>
-                        <li><a href="/products">Shop</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Customer Care</h3>
-                    <ul>
-                        <li><a href="#">Shipping & Returns</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Contact Us</h3>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Furniture Lane, Design District</li>
-                        <li><i class="fas fa-phone"></i> (555) 123-4567</li>
-                        <li><i class="fas fa-envelope"></i> info@aurorahome.com</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 Aurora Home Furniture. All Rights Reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <%- include('./partials/footer.ejs') %>
+
 
     <script src="/js/products.js"></script>
+    <script src="/js/index.js"></script>
+
 </body>
 </html>

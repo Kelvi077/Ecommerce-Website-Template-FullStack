@@ -11,32 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <h1>Aurora Home</h1>
-                </div>
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="/" class="active">Home</a></li>
-                        <li><a href="/about">About</a></li>
-                        <li><a href="/products">Products</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                    </ul>
-                </nav>
-                <div class="cart-icon">
-                    <a href="/cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </a>
-                </div>
-                <div class="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </div>
-            </div>
-        </div>
-    </header>
+    <%- include('./partials/header.ejs') %>
 
     <div class="mobile-menu">
         <ul>
@@ -45,6 +20,7 @@
             <li><a href="/products">Products</a></li>
             <li><a href="/contact">Contact</a></li>
             <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a></li>
+            <li><a href="/login"><i class="fas fa-user"></i> Login/Register</a></li>
         </ul>
     </div>
 
@@ -183,8 +159,6 @@
             </div>
         </div>
     </section>
-
-    <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
@@ -231,11 +205,13 @@
                 <p>&copy; 2025 Aurora Home Furniture. All Rights Reserved.</p>
             </div>
         </div>
-    </footer>
+    </footer> -->
     
+    <%- include('./partials/footer.ejs') %>
+
     <div class="cart-notification">
         <p>Item added to cart! <a href="/cart" class="view-cart-link">View Cart</a></p>
-      </div>
+    </div>
 
     <script src="/js/index.js"></script>
 </body>

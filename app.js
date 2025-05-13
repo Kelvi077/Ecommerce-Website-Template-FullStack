@@ -9,7 +9,8 @@ const nodemailer = require("nodemailer");
 
 // Import the routes
 const cartRoutes = require("./cartRoutes");
-const authRoutes = require("./authRoutes"); // Make sure to import this
+const authRoutes = require("./authRoutes"); 
+const userRoutes = require("./userRoutes"); 
 
 // Register view engine
 app.set("view engine", "ejs");
@@ -29,7 +30,8 @@ app.use(
 
 // Use the routes
 app.use("/api", cartRoutes);
-app.use("/api", authRoutes); // Add auth routes
+app.use("/api", authRoutes); 
+app.use("/api", userRoutes); 
 
 // Main routes
 app.get("/", (req, res) => {
@@ -43,6 +45,7 @@ app.get("/", (req, res) => {
       });
     }
     res.render("index", {
+      path: req.path,
       title: "Home",
       products: results,
       user: req.session.userId ? { name: req.session.name } : null,
@@ -52,6 +55,7 @@ app.get("/", (req, res) => {
 
 app.get("/about", (req, res) => {
   res.render("about", {
+    path: req.path,
     title: "About",
     user: req.session.userId ? { name: req.session.name } : null,
   });
@@ -63,6 +67,7 @@ app.get("/login", (req, res) => {
     return res.redirect("/");
   }
   res.render("login", {
+    path: req.path,
     title: "Login",
     user: null,
   });
@@ -70,6 +75,7 @@ app.get("/login", (req, res) => {
 
 app.get("/contact", (req, res) => {
   res.render("contact", {
+    path: req.path,
     title: "Contact",
     user: req.session.userId ? { name: req.session.name } : null,
   });
@@ -115,6 +121,7 @@ app.get("/cart", (req, res) => {
         });
 
         res.render("cart", {
+          path: req.path,
           title: "Cart",
           cartItems: cartItems,
           user: { name: req.session.name },
@@ -184,6 +191,7 @@ app.get("/cart", (req, res) => {
 
             req.session.cart = sessionCart;
             res.render("cart", {
+              path: req.path,
               title: "Cart",
               cartItems: sessionCart,
               user: null,
@@ -192,6 +200,7 @@ app.get("/cart", (req, res) => {
         );
       } else {
         res.render("cart", {
+          path: req.path,
           title: "Cart",
           cartItems: sessionCart,
           user: null,
@@ -199,6 +208,7 @@ app.get("/cart", (req, res) => {
       }
     } else {
       res.render("cart", {
+        path: req.path,
         title: "Cart",
         cartItems: sessionCart,
         user: null,
@@ -224,6 +234,7 @@ app.get("/profile", (req, res) => {
 
       const user = results[0];
       res.render("profile", {
+        path: req.path,
         title: "My Profile",
         user: user,
       });
@@ -365,6 +376,7 @@ app.get("/products", (req, res) => {
       });
     }
     res.render("products", {
+      path: req.path,
       title: "Products",
       products: results,
       user: req.session.userId ? { name: req.session.name } : null,
@@ -448,4 +460,20 @@ app.get("/api/product-image/:id", (req, res) => {
       });
     }
   );
+});
+
+app.get("/profile", (req, res) => {
+  // Redirect to login if not authenticated
+  if (!req.session.userId) {
+    return res.redirect("/login?redirect=/profile");
+  }
+
+  // Just render the template - data will be loaded via API
+  res.render("profile", {
+    title: "My Profile",
+    user: { 
+      name: req.session.name, 
+      id: req.session.userId 
+    }
+  });
 });

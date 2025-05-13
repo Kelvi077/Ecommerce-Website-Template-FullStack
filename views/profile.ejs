@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Aurora Home</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('./partials/header.ejs') %>
+
+    <div class="mobile-menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count"><%= user && user.cartCount ? user.cartCount : 0 %></span></a></li>
+            <li><a href="/profile" class="active"><i class="fas fa-user"></i> My Account</a></li>
+        </ul>
+    </div>
+
+    <section class="profile-hero">
+        <div class="container">
+            <h1>My Account</h1>
+            <div class="breadcrumb">
+                <a href="/">Home</a> / <span>My Account</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="profile-content">
+        <div class="container">
+            <div class="profile-grid">
+                <!-- Sidebar Navigation -->
+                <div class="profile-sidebar">
+                    <div class="profile-user-info">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-username">
+                            <h3 id="username"><%= user ? user.first_name + ' ' + user.last_name : 'Loading...' %></h3>
+                            <p id="user-email"><%= user ? user.email : 'Loading...' %></p>
+                        </div>
+                    </div>
+                    <ul class="profile-nav">
+                        <li><a href="#dashboard" class="active" data-section="dashboard-section"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="#orders" data-section="orders-section"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                        <li><a href="#addresses" data-section="addresses-section"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                        <li><a href="#account-details" data-section="account-details-section"><i class="fas fa-user-edit"></i> Account Details</a></li>
+                        <li><a href="#wishlist" data-section="wishlist-section"><i class="fas fa-heart"></i> Wishlist</a></li>
+                        <li><a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="profile-main">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="profile-section active">
+                        <h2>Dashboard</h2>
+                        <p>Hello <span id="greeting-name"><%= user ? user.first_name : 'there' %></span>, welcome to your account dashboard!</p>
+                        
+                        <div class="dashboard-cards">
+                            <div class="dashboard-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Orders</h3>
+                                    <p id="orders-count"><%= user && user.stats ? user.stats.ordersCount : 0 %></p>
+                                </div>
+                            </div>
+                            
+                            <div class="dashboard-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Wishlist</h3>
+                                    <p id="wishlist-count"><%= user && user.stats ? user.stats.wishlistCount : 0 %></p>
+                                </div>
+                            </div>
+                            
+                            <div class="dashboard-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Addresses</h3>
+                                    <p id="addresses-count"><%= user && user.stats ? user.stats.addressesCount : 0 %></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-orders">
+                            <h3>Recent Orders</h3>
+                            <div id="dashboard-recent-orders">
+                                <% if (user && user.recentOrders && user.recentOrders.length > 0) { %>
+                                    <% user.recentOrders.slice(0, 3).forEach(order => { %>
+                                        <div class="recent-order-item">
+                                            <div class="order-info">
+                                                <p class="order-id">Order #<%= order.id %></p>
+                                                <p class="order-date"><%= new Date(order.order_date).toLocaleDateString() %></p>
+                                            </div>
+                                            <div class="order-status <%= order.status.toLowerCase() %>">
+                                                <span><%= order.status %></span>
+                                            </div>
+                                            <p class="order-total">$<%= order.total.toFixed(2) %></p>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p class="no-data">You have no recent orders.</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orders Section -->
+                    <div id="orders-section" class="profile-section">
+                        <h2>Orders History</h2>
+                        <div class="orders-list" id="orders-list">
+                            <% if (user && user.orders && user.orders.length > 0) { %>
+                                <% user.orders.forEach(order => { %>
+                                    <div class="order-item">
+                                        <div class="order-header">
+                                            <div class="order-id">
+                                                <h4>Order #<%= order.id %></h4>
+                                                <p class="order-date"><%= new Date(order.order_date).toLocaleDateString() %></p>
+                                            </div>
+                                            <div class="order-status <%= order.status.toLowerCase() %>">
+                                                <span><%= order.status %></span>
+                                            </div>
+                                        </div>
+                                        <div class="order-details">
+                                            <div class="order-items">
+                                                <p><strong>Items:</strong> <%= order.items.length %></p>
+                                                <p><strong>Total:</strong> $<%= order.total.toFixed(2) %></p>
+                                            </div>
+                                            <a href="#" class="btn-sm view-order" data-id="<%= order.id %>">View Details</a>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p class="no-data">You have no orders yet.</p>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Addresses Section -->
+                    <div id="addresses-section" class="profile-section">
+                        <h2>Your Addresses</h2>
+                        
+                        <div class="addresses-container">
+                            <div class="addresses-list" id="addresses-list">
+                                <% if (user && user.addresses && user.addresses.length > 0) { %>
+                                    <% user.addresses.forEach(address => { %>
+                                        <div class="address-card<%= address.is_default ? ' default' : '' %>">
+                                            <%= address.is_default ? '<div class="default-badge">Default</div>' : '' %>
+                                            <h4><%= address.name %></h4>
+                                            <p><%= address.full_name %></p>
+                                            <p><%= address.street %></p>
+                                            <p><%= address.city %>, <%= address.state %> <%= address.zipcode %></p>
+                                            <p><%= address.phone %></p>
+                                            <div class="address-actions">
+                                                <button class="btn-sm edit-address" data-id="<%= address.id %>">Edit</button>
+                                                <button class="btn-sm delete-address" data-id="<%= address.id %>">Delete</button>
+                                                <% if (!address.is_default) { %>
+                                                    <button class="btn-sm set-default-address" data-id="<%= address.id %>">Set as Default</button>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p class="no-data">You have no saved addresses.</p>
+                                <% } %>
+                            </div>
+                            
+                            <div class="add-address">
+                                <h3>Add New Address</h3>
+                                <form id="address-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="address-name">Address Name</label>
+                                            <input type="text" id="address-name" required placeholder="e.g. Home, Office">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="full-name">Full Name</label>
+                                            <input type="text" id="full-name" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="street-address">Street Address</label>
+                                        <input type="text" id="street-address" required>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="city">City</label>
+                                            <input type="text" id="city" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="state">State</label>
+                                            <input type="text" id="state" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="zipcode">Zip Code</label>
+                                            <input type="text" id="zipcode" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="phone">Phone Number</label>
+                                            <input type="tel" id="phone" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group form-checkbox">
+                                        <input type="checkbox" id="default-address">
+                                        <label for="default-address">Set as default address</label>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn">Save Address</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Details Section -->
+                    <div id="account-details-section" class="profile-section">
+                        <h2>Account Details</h2>
+                        
+                        <form id="account-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first-name">First Name</label>
+                                    <input type="text" id="first-name" value="<%= user ? user.first_name : '' %>" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last-name">Last Name</label>
+                                    <input type="text" id="last-name" value="<%= user ? user.last_name : '' %>" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="display-name">Display Name</label>
+                                <input type="text" id="display-name" value="<%= user ? (user.display_name || user.first_name + ' ' + user.last_name) : '' %>" required>
+                                <small>This will be how your name appears in the account section and reviews.</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" value="<%= user ? user.email : '' %>" required>
+                            </div>
+                            
+                            <h3>Password Change</h3>
+                            
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm New Password</label>
+                                <input type="password" id="confirm-password">
+                            </div>
+                            
+                            <button type="submit" class="btn">Save Changes</button>
+                        </form>
+                    </div>
+
+                    <!-- Wishlist Section -->
+                    <div id="wishlist-section" class="profile-section">
+                        <h2>Your Wishlist</h2>
+                        
+                        <div class="wishlist-products" id="wishlist-products">
+                            <% if (user && user.wishlist && user.wishlist.length > 0) { %>
+                                <% user.wishlist.forEach(item => { %>
+                                    <div class="wishlist-product">
+                                        <div class="product-image">
+                                            <img src="<%= item.image.startsWith('/') ? item.image : '/images/' + item.image %>" alt="<%= item.name %>">
+                                        </div>
+                                        <div class="product-details">
+                                            <h4><%= item.name %></h4>
+                                            <p class="price">$<%= item.price.toFixed(2) %></p>
+                                            <div class="wishlist-actions">
+                                                <button class="btn-sm add-to-cart" data-id="<%= item.id %>">Add to Cart</button>
+                                                <button class="btn-sm remove-from-wishlist" data-id="<%= item.id %>">Remove</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p class="no-data">Your wishlist is empty.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer.ejs') %>
+
+    <div class="notification" id="notification">
+        <p id="notification-message"></p>
+    </div>
+
+    <script src="/js/profile.js"></script>
+    <script src="/js/index.js"></script>
+
+</body>
+</html>

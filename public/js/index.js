@@ -13,7 +13,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize cart count on page load
   updateCartCount();
+
+  // Check user authentication status
+  checkAuthStatus();
 });
+
+// Check if user is logged in
+let userLoggedIn = false;
+
+function checkAuthStatus() {
+  fetch("/api/auth/check")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        userLoggedIn = data.loggedIn;
+
+        // Update login/account link in header if needed
+        updateHeaderLoginState(data.loggedIn, data.user);
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking auth status:", error);
+    });
+}
+
+// Update header to show "Account" instead of "Login" if user is logged in
+function updateHeaderLoginState(isLoggedIn, user) {
+  const accountText = document.querySelector(".account-text");
+  const mobileLoginLink = document.querySelector(".mobile-menu li a[href='/login']");
+  
+  if (accountText && isLoggedIn && user) {
+    // Update desktop menu
+    accountText.textContent = "My Account";
+    accountText.parentElement.href = "/profile";
+    
+    // Update mobile menu
+    if (mobileLoginLink) {
+      mobileLoginLink.innerHTML = '<i class="fas fa-user"></i> My Account';
+      mobileLoginLink.href = "/profile";
+    }
+  }
+}
 
 // Mobile Menu Functionality
 function initMobileMenu() {
@@ -150,6 +190,14 @@ function setupAddToCart() {
 
   addToCartBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
+      // Check if user is logged in before proceeding
+      if (!userLoggedIn) {
+        // Save current page URL for redirect after login
+        const currentPage = window.location.pathname + window.location.search;
+        redirectToLogin(currentPage);
+        return;
+      }
+
       const productId = this.getAttribute("data-id");
 
       if (this.hasAttribute("disabled")) {
@@ -164,14 +212,22 @@ function setupAddToCart() {
       const price = product.hasAttribute("data-price")
         ? parseFloat(product.getAttribute("data-price"))
         : parseFloat(priceEl.textContent.replace(/[^0-9.]/g, ""));
-      const image = product.querySelector(".product-image img").src.split('/').pop();
+      const image = product
+        .querySelector(".product-image img")
+        .src.split("/")
+        .pop();
       const category = product.querySelector(".product-category").textContent;
-      
+
       // Add to cart via API
       addToCart(productId, name, price, image, category, 1);
       animateAddToCart(this);
     });
   });
+}
+
+// Redirect to login page with return URL
+function redirectToLogin(returnUrl) {
+  window.location.href = `/login?redirect=${encodeURIComponent(returnUrl || window.location.pathname)}`;
 }
 
 /**
@@ -184,6 +240,12 @@ function setupAddToCart() {
  * @param {number} quantity - The quantity to add
  */
 function addToCart(productId, name, price, image, category, quantity) {
+  // First check login status again (in case it changed)
+  if (!userLoggedIn) {
+    redirectToLogin();
+    return;
+  }
+
   // Prepare the data for the API call
   const cartData = {
     productId: productId,
@@ -191,32 +253,48 @@ function addToCart(productId, name, price, image, category, quantity) {
     price: price,
     image: image,
     category: category,
-    quantity: quantity
+    quantity: quantity,
   };
-  
+
   // Send POST request to add-to-cart API endpoint
-  fetch('/api/add-to-cart', {
-    method: 'POST',
+  fetch("/api/add-to-cart", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(cartData)
+    body: JSON.stringify(cartData),
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.status === 'success') {
-      // If successful, update the cart count and show notification
-      updateCartCount();
-      showCartNotification();
-    } else {
-      console.error('Error adding to cart:', data.message);
-      alert('There was an error adding this item to your cart. Please try again.');
-    }
-  })
-  .catch(error => {
-    console.error('Error adding to cart:', error);
-    alert('There was an error adding this item to your cart. Please try again.');
-  });
+    .then((response) => {
+      // Check if response redirects to login page (status 401 or 302)
+      if (response.status === 401 || response.status === 302) {
+        redirectToLogin();
+        throw new Error("Login required");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.status === "success") {
+        // If successful, update the cart count and show notification
+        updateCartCount();
+        showCartNotification();
+      } else if (data.status === "auth_required") {
+        // Redirect to login if server indicates authentication is required
+        redirectToLogin();
+      } else {
+        console.error("Error adding to cart:", data.message);
+        alert(
+          "There was an error adding this item to your cart. Please try again."
+        );
+      }
+    })
+    .catch((error) => {
+      if (error.message !== "Login required") {
+        console.error("Error adding to cart:", error);
+        alert(
+          "There was an error adding this item to your cart. Please try again."
+        );
+      }
+    });
 }
 
 // Animation for adding to cart
@@ -244,11 +322,11 @@ function showCartNotification() {
       </p>
     `;
     document.body.appendChild(newNotification);
-    
+
     setTimeout(() => {
       newNotification.classList.add("show");
     }, 100);
-    
+
     setTimeout(() => {
       newNotification.classList.remove("show");
     }, 3000);
@@ -260,7 +338,7 @@ function showCartNotification() {
       </p>
     `;
     notification.classList.add("show");
-    
+
     setTimeout(() => {
       notification.classList.remove("show");
     }, 3000);
@@ -270,30 +348,30 @@ function showCartNotification() {
 // Update cart count display by fetching from server
 function updateCartCount() {
   // Fetch cart count from the server
-  fetch('/api/cart-count')
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === 'success') {
+  fetch("/api/cart-count")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
         // Update all cart count elements
         const cartCountElements = document.querySelectorAll(".cart-count");
         cartCountElements.forEach((element) => {
           element.textContent = data.count;
         });
       } else {
-        console.error('Error fetching cart count:', data.message);
+        console.error("Error fetching cart count:", data.message);
       }
     })
-    .catch(error => {
-      console.error('Error fetching cart count:', error);
+    .catch((error) => {
+      console.error("Error fetching cart count:", error);
     });
 }
 
 // Quick View functionality
 function setupQuickView() {
   const quickViewBtns = document.querySelectorAll(".quick-view-btn");
-  
+
   if (quickViewBtns.length === 0) return;
-  
+
   // Check if modal exists, create if not
   let quickViewModal = document.querySelector(".quick-view-modal");
   if (!quickViewModal) {
@@ -308,50 +386,54 @@ function setupQuickView() {
       </div>
     `;
     document.body.appendChild(quickViewModal);
-    
+
     // Add event listener to close modal
     const closeModal = quickViewModal.querySelector(".close-modal");
-    closeModal.addEventListener("click", function() {
+    closeModal.addEventListener("click", function () {
       quickViewModal.style.display = "none";
       document.body.style.overflow = "auto";
     });
-    
+
     // Close modal when clicking outside
-    window.addEventListener("click", function(event) {
+    window.addEventListener("click", function (event) {
       if (event.target === quickViewModal) {
         quickViewModal.style.display = "none";
         document.body.style.overflow = "auto";
       }
     });
   }
-  
+
   const modalContent = quickViewModal.querySelector(".modal-product-content");
-  
-  quickViewBtns.forEach(btn => {
-    btn.addEventListener("click", function() {
+
+  quickViewBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
       const productId = this.getAttribute("data-id");
       const product = this.closest(".product-card");
-      
+
       // Handle "Check All Products" link case
       if (btn.textContent.includes("Check All Products")) {
         window.location.href = "/products";
         return;
       }
-      
+
       const productTitle = product.querySelector(".product-title").textContent;
-      const productCategory = product.querySelector(".product-category").textContent;
+      const productCategory =
+        product.querySelector(".product-category").textContent;
       const productPrice = product.querySelector(".product-price").innerHTML;
       const productImage = product.querySelector(".product-image img").src;
-      const imageFilename = productImage.split('/').pop();
-      const productPriceValue = parseFloat(productPrice.replace(/[^0-9.]/g, ""));
-      
+      const imageFilename = productImage.split("/").pop();
+      const productPriceValue = parseFloat(
+        productPrice.replace(/[^0-9.]/g, "")
+      );
+
       // Get product description if available
-      let productDescription = "View our complete collection for detailed product information.";
+      let productDescription =
+        "View our complete collection for detailed product information.";
       const descriptionElem = product.querySelector(".product-description");
       if (descriptionElem) {
         productDescription = descriptionElem.textContent;
       }
-      
+
       // Create modal content
       modalContent.innerHTML = `
         <div class="modal-product-image">
@@ -395,31 +477,40 @@ function setupQuickView() {
           </div>
         </div>
       `;
-      
+
       // Show modal
       quickViewModal.style.display = "block";
       document.body.style.overflow = "hidden";
-      
+
       // Add event listeners for quantity buttons
       const decrease = modalContent.querySelector(".decrease");
       const increase = modalContent.querySelector(".increase");
       const quantityInput = modalContent.querySelector(".quantity-value");
-      
-      decrease.addEventListener("click", function() {
+
+      decrease.addEventListener("click", function () {
         let value = parseInt(quantityInput.value);
         if (value > 1) {
           quantityInput.value = value - 1;
         }
       });
-      
-      increase.addEventListener("click", function() {
+
+      increase.addEventListener("click", function () {
         let value = parseInt(quantityInput.value);
         quantityInput.value = value + 1;
       });
-      
+
       // Add event listener for modal add to cart button
-      const modalAddToCartBtn = modalContent.querySelector(".modal-add-to-cart");
-      modalAddToCartBtn.addEventListener("click", function() {
+      const modalAddToCartBtn =
+        modalContent.querySelector(".modal-add-to-cart");
+      modalAddToCartBtn.addEventListener("click", function () {
+        // Check login status before adding to cart
+        if (!userLoggedIn) {
+          // Save current page URL for redirect after login
+          const currentPage = window.location.pathname + window.location.search;
+          redirectToLogin(currentPage);
+          return;
+        }
+
         // Extract data attributes
         const productId = this.getAttribute("data-id");
         const name = this.getAttribute("data-name");
@@ -427,10 +518,10 @@ function setupQuickView() {
         const image = this.getAttribute("data-image");
         const category = this.getAttribute("data-category");
         const quantity = parseInt(quantityInput.value);
-        
+
         // Call addToCart with extracted data
         addToCart(productId, name, price, image, category, quantity);
-        
+
         quickViewModal.style.display = "none";
         document.body.style.overflow = "auto";
       });

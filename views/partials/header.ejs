@@ -1,0 +1,81 @@
+<!-- <header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Aurora Home</h1>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/" <%= title === 'Home' ? 'class="active"' : '' %>>Home</a></li>
+                    <li><a href="/about" <%= title === 'About' ? 'class="active"' : '' %>>About</a></li>
+                    <li><a href="/products" <%= title === 'Products' ? 'class="active"' : '' %>>Products</a></li>
+                    <li><a href="/contact" <%= title === 'Contact' ? 'class="active"' : '' %>>Contact</a></li>
+                </ul>
+            </nav>
+            <div class="account-cart-container">
+                <div class="account-icon">
+                    <a href="/profile" <%= title === 'Profile' ? 'class="active"' : '' %>>
+                        <i class="fas fa-user"></i>
+                        <span class="account-text">My Account</span>
+                    </a>
+                </div>
+                <div class="cart-icon">
+                    <a href="/cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count"><%= user && user.cartCount ? user.cartCount : 0 %></span>
+                    </a>
+                </div>
+            </div>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </div>
+</header> -->
+
+<!-- Header partial for Aurora Home website -->
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Aurora Home</h1>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/" class="<%= path === '/' ? 'active' : '' %>">Home</a></li>
+                    <li><a href="/about" class="<%= path === '/about' ? 'active' : '' %>">About</a></li>
+                    <li><a href="/products" class="<%= path === '/products' ? 'active' : '' %>">Products</a></li>
+                    <li><a href="/contact" class="<%= path === '/contact' ? 'active' : '' %>">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="account-cart-container">
+                <div class="account-icon">
+                    <a href="/login">
+                        <i class="fas fa-user"></i>
+                        <span class="account-text">Login</span>
+                    </a>
+                </div>
+                <div class="cart-icon">
+                    <a href="/cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="mobile-menu">
+    <ul>
+        <li><a href="/" class="<%= path === '/' ? 'active' : '' %>">Home</a></li>
+        <li><a href="/about" class="<%= path === '/about' ? 'active' : '' %>">About</a></li>
+        <li><a href="/products" class="<%= path === '/products' ? 'active' : '' %>">Products</a></li>
+        <li><a href="/contact" class="<%= path === '/contact' ? 'active' : '' %>">Contact</a></li>
+        <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a></li>
+        <li><a href="/login"><i class="fas fa-user"></i> Login/Register</a></li>
+    </ul>
+</div>

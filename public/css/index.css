@@ -88,6 +88,58 @@ header {
   padding: 20px 0;
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 0;
+}
+
+/* Add this new style block for the account/cart container */
+.account-cart-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.account-icon a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: #6e493a;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.account-icon a:hover {
+  color: #d0a98f;
+}
+
+.account-text {
+  font-size: 14px;
+}
+
+/* Existing cart icon styles */
+.cart-icon a {
+  position: relative;
+  color: #6e493a;
+  font-size: 18px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.cart-icon a:hover {
+  color: #d0a98f;
+}
+
+/* Mobile styles for the account icon */
+@media (max-width: 768px) {
+  .account-icon {
+    display: none;
+  }
+}
+
 .logo h1 {
   font-family: var(--font-primary);
   font-size: 28px;
@@ -813,14 +865,16 @@ footer {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #4A332F;
+  background-color: #4a332f;
   color: white;
   padding: 15px 20px;
   border-radius: 5px;
   z-index: 1000;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -830,7 +884,7 @@ footer {
 }
 
 .view-cart-link {
-  color: #F4EAD5;
+  color: #f4ead5;
   text-decoration: underline;
   margin-left: 5px;
   font-weight: 500;
@@ -838,12 +892,12 @@ footer {
 }
 
 .view-cart-link:hover {
-  color: #D9CBA6;
+  color: #d9cba6;
 }
 
 /* Add to cart button animation */
 .add-to-cart-btn.added {
-  background-color: #4A332F;
+  background-color: #4a332f;
   color: white;
 }
 
@@ -878,11 +932,11 @@ footer {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
-  color: #6E493A;
+  color: #6e493a;
 }
 
 .close-modal:hover {
-  color: #4A332F;
+  color: #4a332f;
 }
 
 .modal-product-content {
@@ -909,22 +963,22 @@ footer {
 }
 
 .modal-product-title {
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
   font-size: 24px;
   margin-bottom: 10px;
-  color: #4A332F;
+  color: #4a332f;
 }
 
 .modal-product-price {
   font-size: 22px;
   font-weight: 600;
-  color: #6E493A;
+  color: #6e493a;
   margin-bottom: 20px;
 }
 
 .modal-product-description {
   margin-bottom: 20px;
-  color: #5A5A5A;
+  color: #5a5a5a;
   line-height: 1.6;
 }
 
@@ -963,7 +1017,7 @@ footer {
 }
 
 .modal-add-to-cart {
-  background-color: #6E493A;
+  background-color: #6e493a;
   color: white;
   border: none;
   padding: 12px 25px;
@@ -977,7 +1031,7 @@ footer {
 }
 
 .modal-add-to-cart:hover {
-  background-color: #4A332F;
+  background-color: #4a332f;
 }
 
 .product-meta {
@@ -1002,7 +1056,7 @@ footer {
     width: 95%;
     padding: 15px;
   }
-  
+
   .modal-product-content {
     flex-direction: column;
   }
@@ -1056,7 +1110,8 @@ footer {
   background-color: var(--soft-peach);
 }
 
-.category-table th, .category-table td {
+.category-table th,
+.category-table td {
   padding: 0.8rem;
   text-align: left;
 }
