@@ -73,7 +73,11 @@
                             <% cartItems.forEach(item => { %>
                                 <div class="cart-item" data-id="<%= item.id %>">
                                     <div class="cart-item-product">
-                                        <img src="/images/<%= item.cart_image %>" alt="<%= item.product_name %>" class="cart-item-image">
+                                        <!-- The image path - don't append /images/ if it's already included -->
+                                        <img src="<%= item.cart_image.startsWith('/') ? item.cart_image : '/images/' + item.cart_image %>" 
+                                            alt="<%= item.product_name %>" 
+                                            class="cart-item-image"
+                                            onerror="this.onerror=null; this.src='/images/placeholder.jpg';">
                                         <div class="cart-item-details">
                                             <h3><%= item.product_name %></h3>
                                             <p><%= item.category || '' %></p>
@@ -354,5 +358,6 @@
 
     <script src="/js/cart.js"></script>
     <script src="/js/checkout.js"></script>
+    <script src="/js/fix-cart-images.js"></script> 
 </body>
 </html>

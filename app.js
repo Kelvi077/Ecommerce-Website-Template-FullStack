@@ -8,8 +8,8 @@ const session = require("express-session");
 const nodemailer = require("nodemailer");
 
 // Import the routes
-const cartRoutes = require('./cartRoutes');
-const authRoutes = require('./authRoutes'); // Make sure to import this
+const cartRoutes = require("./cartRoutes");
+const authRoutes = require("./authRoutes"); // Make sure to import this
 
 // Register view engine
 app.set("view engine", "ejs");
@@ -20,16 +20,16 @@ app.use(express.json());
 // Log in sessions
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key', // Fallback for development
+    secret: process.env.SESSION_SECRET || "your-secret-key", // Fallback for development
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hours
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 24 hours
   })
 );
 
 // Use the routes
-app.use('/api', cartRoutes);
-app.use('/api', authRoutes); // Add auth routes
+app.use("/api", cartRoutes);
+app.use("/api", authRoutes); // Add auth routes
 
 // Main routes
 app.get("/", (req, res) => {
@@ -39,39 +39,39 @@ app.get("/", (req, res) => {
       return res.render("index", {
         title: "Home",
         products: [],
-        user: req.session.userId ? { name: req.session.name } : null
+        user: req.session.userId ? { name: req.session.name } : null,
       });
     }
     res.render("index", {
       title: "Home",
       products: results,
-      user: req.session.userId ? { name: req.session.name } : null
+      user: req.session.userId ? { name: req.session.name } : null,
     });
   });
 });
 
 app.get("/about", (req, res) => {
-  res.render("about", { 
+  res.render("about", {
     title: "About",
-    user: req.session.userId ? { name: req.session.name } : null
+    user: req.session.userId ? { name: req.session.name } : null,
   });
 });
 
 app.get("/login", (req, res) => {
   // If already logged in, redirect to home
   if (req.session.userId) {
-    return res.redirect('/');
+    return res.redirect("/");
   }
-  res.render("login", { 
+  res.render("login", {
     title: "Login",
-    user: null
+    user: null,
   });
 });
 
 app.get("/contact", (req, res) => {
-  res.render("contact", { 
+  res.render("contact", {
     title: "Contact",
-    user: req.session.userId ? { name: req.session.name } : null
+    user: req.session.userId ? { name: req.session.name } : null,
   });
 });
 
@@ -80,33 +80,130 @@ app.get("/cart", (req, res) => {
   if (req.session.userId) {
     // Get from database if logged in
     connection.query(
-      "SELECT * FROM cart_items WHERE customer_id = ?", 
-      [req.session.userId], 
+      `SELECT ci.*, 
+      IFNULL(ci.cart_image, p.image) as cart_image 
+      FROM cart_items ci 
+      LEFT JOIN products p ON ci.product_id = p.id 
+      WHERE ci.customer_id = ?`,
+      [req.session.userId],
       (err, cartItems) => {
         if (err) {
           console.error("Error fetching cart items:", err);
-          return res.render("cart", { 
+          return res.render("cart", {
             title: "Cart",
             cartItems: [],
-            user: { name: req.session.name }
+            user: { name: req.session.name },
           });
         }
-        
-        res.render("cart", { 
+
+        // Process cart items to ensure image paths are correct
+        cartItems = cartItems.map((item) => {
+          // Normalize image path
+          if (item.cart_image) {
+            // If image path doesn't include /images/ and doesn't start with /
+            if (
+              !item.cart_image.includes("/images/") &&
+              !item.cart_image.startsWith("/")
+            ) {
+              item.cart_image = `/images/${item.cart_image}`;
+            }
+          } else {
+            // Fallback to placeholder
+            item.cart_image = "/images/placeholder.jpg";
+          }
+          return item;
+        });
+
+        res.render("cart", {
           title: "Cart",
           cartItems: cartItems,
-          user: { name: req.session.name }
+          user: { name: req.session.name },
         });
       }
     );
   } else {
     // Use session cart if not logged in
-    const sessionCart = req.session.cart || [];
-    res.render("cart", { 
-      title: "Cart",
-      cartItems: sessionCart,
-      user: null
-    });
+    let sessionCart = req.session.cart || [];
+
+    // If session cart has items but no proper image paths, let's fetch them
+    if (sessionCart.length > 0) {
+      // Get all product IDs from the cart
+      const productIds = sessionCart.map((item) => item.productId);
+
+      if (productIds.length > 0) {
+        connection.query(
+          "SELECT id, image FROM products WHERE id IN (?)",
+          [productIds],
+          (err, products) => {
+            if (err) {
+              console.error("Error fetching product images:", err);
+              return res.render("cart", {
+                title: "Cart",
+                cartItems: sessionCart,
+                user: null,
+              });
+            }
+
+            // Create a map of product IDs to image paths
+            const productImages = {};
+            products.forEach((product) => {
+              productImages[product.id] = `/images/${product.image}`;
+            });
+
+            // Update cart items with proper image paths
+            sessionCart = sessionCart.map((item, index) => {
+              // Add id if not present (needed for removing items)
+              if (!item.id) {
+                item.id = index;
+              }
+
+              // Ensure product_name is set for consistency with DB cart
+              if (!item.product_name && item.name) {
+                item.product_name = item.name;
+              }
+
+              // Fix image path
+              if (productImages[item.productId]) {
+                item.cart_image = productImages[item.productId];
+              } else if (item.image) {
+                // If item has an image property but no path correction
+                if (
+                  !item.image.includes("/images/") &&
+                  !item.image.startsWith("/")
+                ) {
+                  item.cart_image = `/images/${item.image}`;
+                } else {
+                  item.cart_image = item.image;
+                }
+              } else {
+                item.cart_image = "/images/placeholder.jpg";
+              }
+
+              return item;
+            });
+
+            req.session.cart = sessionCart;
+            res.render("cart", {
+              title: "Cart",
+              cartItems: sessionCart,
+              user: null,
+            });
+          }
+        );
+      } else {
+        res.render("cart", {
+          title: "Cart",
+          cartItems: sessionCart,
+          user: null,
+        });
+      }
+    } else {
+      res.render("cart", {
+        title: "Cart",
+        cartItems: sessionCart,
+        user: null,
+      });
+    }
   }
 });
 
@@ -115,7 +212,7 @@ app.get("/profile", (req, res) => {
   if (!req.session.userId) {
     return res.redirect("/login?redirect=/profile");
   }
-  
+
   connection.query(
     "SELECT * FROM customers WHERE id = ?",
     [req.session.userId],
@@ -124,11 +221,11 @@ app.get("/profile", (req, res) => {
         console.error("Error fetching user profile:", err);
         return res.redirect("/");
       }
-      
+
       const user = results[0];
       res.render("profile", {
         title: "My Profile",
-        user: user
+        user: user,
       });
     }
   );
@@ -264,13 +361,13 @@ app.get("/products", (req, res) => {
       return res.render("products", {
         title: "Products",
         products: [],
-        user: req.session.userId ? { name: req.session.name } : null
+        user: req.session.userId ? { name: req.session.name } : null,
       });
     }
     res.render("products", {
       title: "Products",
       products: results,
-      user: req.session.userId ? { name: req.session.name } : null
+      user: req.session.userId ? { name: req.session.name } : null,
     });
   });
 });
@@ -323,4 +420,32 @@ ${req.body.message}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// API endpoint to fetch product image
+app.get("/api/product-image/:id", (req, res) => {
+  const productId = req.params.id;
+
+  connection.query(
+    "SELECT image FROM products WHERE id = ?",
+    [productId],
+    (err, results) => {
+      if (err || results.length === 0) {
+        console.error("Error fetching product image:", err);
+        return res.json({
+          status: "error",
+          message: "Error fetching product image",
+          imagePath: "/images/placeholder.jpg",
+        });
+      }
+
+      const imagePath = results[0].image;
+      res.json({
+        status: "success",
+        imagePath: imagePath.startsWith("/")
+          ? imagePath
+          : `/images/${imagePath}`,
+      });
+    }
+  );
 });

@@ -7,6 +7,12 @@ const connection = require("./db"); // Import your database connection
 router.post("/add-to-cart", (req, res) => {
   const { productId, name, price, image, category, quantity } = req.body;
 
+  // Normalize image path - don't add /images/ if it's already there
+  let normalizedImage = image;
+  if (image && !image.includes("/images/") && !image.startsWith("/")) {
+    normalizedImage = `/images/${image}`;
+  }
+
   // Check if user is logged in
   if (req.session.userId) {
     // First check if the product is already in the cart
@@ -56,7 +62,7 @@ router.post("/add-to-cart", (req, res) => {
               name,
               price,
               quantity,
-              image,
+              normalizedImage,
               category,
             ],
             (err) => {
@@ -96,8 +102,10 @@ router.post("/add-to-cart", (req, res) => {
       req.session.cart.push({
         productId,
         name,
+        product_name: name, // Add for consistency with DB cart
         price,
-        image,
+        image: normalizedImage,
+        cart_image: normalizedImage, // Add for consistency with DB cart
         category,
         quantity: parseInt(quantity),
       });
