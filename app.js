@@ -9,8 +9,8 @@ const nodemailer = require("nodemailer");
 
 // Import the routes
 const cartRoutes = require("./cartRoutes");
-const authRoutes = require("./authRoutes"); 
-const userRoutes = require("./userRoutes"); 
+const authRoutes = require("./authRoutes");
+const userRoutes = require("./userRoutes");
 
 // Register view engine
 app.set("view engine", "ejs");
@@ -30,8 +30,8 @@ app.use(
 
 // Use the routes
 app.use("/api", cartRoutes);
-app.use("/api", authRoutes); 
-app.use("/api", userRoutes); 
+app.use("/api", authRoutes);
+app.use("/api", userRoutes);
 
 // Main routes
 app.get("/", (req, res) => {
@@ -430,10 +430,6 @@ ${req.body.message}
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
 // API endpoint to fetch product image
 app.get("/api/product-image/:id", (req, res) => {
   const productId = req.params.id;
@@ -471,9 +467,25 @@ app.get("/profile", (req, res) => {
   // Just render the template - data will be loaded via API
   res.render("profile", {
     title: "My Profile",
-    user: { 
-      name: req.session.name, 
-      id: req.session.userId 
-    }
+    user: {
+      name: req.session.name,
+      id: req.session.userId,
+    },
   });
+});
+
+app.get("/logout", (req, res) => {
+  // Destroy the session to log the user out
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error during logout:", err);
+      return res.status(500).send("Error logging out");
+    }
+    // Redirect to home page after successful logout
+    res.redirect("/");
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

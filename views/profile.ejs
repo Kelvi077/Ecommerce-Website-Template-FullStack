@@ -161,11 +161,10 @@
                                     <% user.addresses.forEach(address => { %>
                                         <div class="address-card<%= address.is_default ? ' default' : '' %>">
                                             <%= address.is_default ? '<div class="default-badge">Default</div>' : '' %>
-                                            <h4><%= address.name %></h4>
-                                            <p><%= address.full_name %></p>
-                                            <p><%= address.street %></p>
-                                            <p><%= address.city %>, <%= address.state %> <%= address.zipcode %></p>
-                                            <p><%= address.phone %></p>
+                                            <h4><%= address.name || 'My Address' %></h4>
+                                            <p><%= address.address || '' %></p>
+                                            <p><%= address.city || '' %><%= (address.city && address.postal_code) ? ', ' : '' %><%= address.postal_code || '' %></p>
+                                            <p><%= address.country || '' %></p>
                                             <div class="address-actions">
                                                 <button class="btn-sm edit-address" data-id="<%= address.id %>">Edit</button>
                                                 <button class="btn-sm delete-address" data-id="<%= address.id %>">Delete</button>
@@ -183,20 +182,14 @@
                             <div class="add-address">
                                 <h3>Add New Address</h3>
                                 <form id="address-form">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="address-name">Address Name</label>
-                                            <input type="text" id="address-name" required placeholder="e.g. Home, Office">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="full-name">Full Name</label>
-                                            <input type="text" id="full-name" required>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="address-name">Address Name</label>
+                                        <input type="text" id="address-name" required placeholder="e.g. Home, Office">
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="street-address">Street Address</label>
-                                        <input type="text" id="street-address" required>
+                                        <label for="address">Address</label>
+                                        <input type="text" id="address" required placeholder="Street address, apartment, building">
                                     </div>
                                     
                                     <div class="form-row">
@@ -205,20 +198,14 @@
                                             <input type="text" id="city" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="state">State</label>
-                                            <input type="text" id="state" required>
+                                            <label for="postal-code">Postal Code</label>
+                                            <input type="text" id="postal-code" required>
                                         </div>
                                     </div>
                                     
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="zipcode">Zip Code</label>
-                                            <input type="text" id="zipcode" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="phone">Phone Number</label>
-                                            <input type="tel" id="phone" required>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="country">Country</label>
+                                        <input type="text" id="country" required>
                                     </div>
                                     
                                     <div class="form-group form-checkbox">
@@ -310,6 +297,8 @@
             </div>
         </div>
     </section>
+
+    <br>
 
     <%- include('./partials/footer.ejs') %>
 

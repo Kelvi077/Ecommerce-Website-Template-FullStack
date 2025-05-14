@@ -1,4 +1,4 @@
-// profile.js - Save this to public/js/profile.js
+// Modified profile.js file to match your database structure
 document.addEventListener("DOMContentLoaded", () => {
   // Mobile menu toggle
   const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Load orders
+  // Load orders (unchanged)
   async function loadOrders() {
     try {
       const response = await fetch("/api/user/orders");
@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // This would typically open a modal with detailed order information
   }
 
-  // Load addresses
+  // Load addresses - UPDATED FOR NEW SCHEMA
   async function loadAddresses() {
     try {
       const response = await fetch("/api/user/addresses");
@@ -224,11 +224,10 @@ document.addEventListener("DOMContentLoaded", () => {
             (address) => `
                     <div class="address-card${address.is_default ? " default" : ""}">
                         ${address.is_default ? '<div class="default-badge">Default</div>' : ""}
-                        <h4>${address.name}</h4>
-                        <p>${address.full_name}</p>
-                        <p>${address.street}</p>
-                        <p>${address.city}, ${address.state} ${address.zipcode}</p>
-                        <p>${address.phone}</p>
+                        <h4>${address.name || "My Address"}</h4>
+                        <p>${address.address || ""}</p>
+                        <p>${address.city || ""}${address.city && address.postal_code ? ", " : ""}${address.postal_code || ""}</p>
+                        <p>${address.country || ""}</p>
                         <div class="address-actions">
                             <button class="btn-sm edit-address" data-id="${address.id}">Edit</button>
                             <button class="btn-sm delete-address" data-id="${address.id}">Delete</button>
@@ -275,8 +274,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle address actions
   function editAddress(addressId) {
-    // Implementation for editing address
-    console.log(`Editing address #${addressId}`);
+    // Get the specific address data to populate the form
+    fetch(`/api/user/address/${addressId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "success") {
+          const address = data.address;
+
+          // Populate the address form
+          document.getElementById("address-name").value = address.name || "";
+          document.getElementById("address").value = address.address || "";
+          document.getElementById("city").value = address.city || "";
+          document.getElementById("postal-code").value =
+            address.postal_code || "";
+          document.getElementById("country").value = address.country || "";
+          document.getElementById("default-address").checked =
+            address.is_default || false;
+
+          // Change the form action to update instead of add
+          const addressForm = document.getElementById("address-form");
+          addressForm.dataset.mode = "edit";
+          addressForm.dataset.addressId = addressId;
+
+          // Change button text
+          const submitButton = addressForm.querySelector(
+            'button[type="submit"]'
+          );
+          submitButton.textContent = "Update Address";
+
+          // Scroll to the form
+          document
+            .querySelector(".add-address")
+            .scrollIntoView({ behavior: "smooth" });
+        } else {
+          showNotification("Failed to load address details", true);
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading address details:", error);
+        showNotification("Failed to load address details", true);
+      });
   }
 
   function deleteAddress(addressId) {
@@ -292,6 +329,15 @@ document.addEventListener("DOMContentLoaded", () => {
           if (data.status === "success") {
             showNotification("Address deleted successfully");
             loadAddresses(); // Reload addresses
+
+            // Update address count in dashboard
+            const currentCount = parseInt(
+              document.getElementById("addresses-count").textContent || "0"
+            );
+            document.getElementById("addresses-count").textContent = Math.max(
+              0,
+              currentCount - 1
+            );
           } else {
             showNotification("Failed to delete address", true);
           }
@@ -325,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Load wishlist
+  // Load wishlist (unchanged)
   async function loadWishlist() {
     try {
       const response = await fetch("/api/user/wishlist");
@@ -381,7 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle wishlist actions
+  // Handle wishlist actions (unchanged)
   function addToCart(productId) {
     fetch("/api/cart/add", {
       method: "POST",
@@ -444,7 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Handle form submissions
+  // Handle form submissions - UPDATED FOR NEW SCHEMA
   const addressForm = document.getElementById("address-form");
   if (addressForm) {
     addressForm.addEventListener("submit", function (e) {
@@ -452,17 +498,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const formData = {
         name: document.getElementById("address-name").value,
-        full_name: document.getElementById("full-name").value,
-        street: document.getElementById("street-address").value,
+        address: document.getElementById("address").value,
         city: document.getElementById("city").value,
-        state: document.getElementById("state").value,
-        zipcode: document.getElementById("zipcode").value,
-        phone: document.getElementById("phone").value,
+        postal_code: document.getElementById("postal-code").value,
+        country: document.getElementById("country").value,
         is_default: document.getElementById("default-address").checked,
       };
 
-      fetch("/api/user/address/add", {
-        method: "POST",
+      // Check if we're in edit mode
+      const isEditMode = addressForm.dataset.mode === "edit";
+      const addressId = addressForm.dataset.addressId;
+
+      let url = "/api/user/address/add";
+      let method = "POST";
+
+      if (isEditMode) {
+        url = `/api/user/address/${addressId}/update`;
+        method = "PUT";
+      }
+
+      fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -471,27 +527,56 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.status === "success") {
-            showNotification("Address added successfully");
+            showNotification(
+              isEditMode
+                ? "Address updated successfully"
+                : "Address added successfully"
+            );
             addressForm.reset();
+
+            // Reset form to add mode
+            if (isEditMode) {
+              addressForm.dataset.mode = "add";
+              delete addressForm.dataset.addressId;
+
+              // Reset button text
+              const submitButton = addressForm.querySelector(
+                'button[type="submit"]'
+              );
+              submitButton.textContent = "Save Address";
+            }
+
             loadAddresses(); // Reload addresses
 
-            // Update address count in dashboard
-            const currentCount = parseInt(
-              document.getElementById("addresses-count").textContent || "0"
-            );
-            document.getElementById("addresses-count").textContent =
-              currentCount + 1;
+            // Update address count in dashboard (only if adding new)
+            if (!isEditMode) {
+              const currentCount = parseInt(
+                document.getElementById("addresses-count").textContent || "0"
+              );
+              document.getElementById("addresses-count").textContent =
+                currentCount + 1;
+            }
           } else {
-            showNotification("Failed to add address", true);
+            showNotification(
+              `Failed to ${isEditMode ? "update" : "add"} address`,
+              true
+            );
           }
         })
         .catch((error) => {
-          console.error("Error adding address:", error);
-          showNotification("Failed to add address", true);
+          console.error(
+            `Error ${isEditMode ? "updating" : "adding"} address:`,
+            error
+          );
+          showNotification(
+            `Failed to ${isEditMode ? "update" : "add"} address`,
+            true
+          );
         });
     });
   }
 
+  // Account form handling (unchanged)
   const accountForm = document.getElementById("account-form");
   if (accountForm) {
     accountForm.addEventListener("submit", function (e) {
