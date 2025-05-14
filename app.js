@@ -11,6 +11,7 @@ const nodemailer = require("nodemailer");
 const cartRoutes = require("./cartRoutes");
 const authRoutes = require("./authRoutes");
 const userRoutes = require("./userRoutes");
+const receiptRoutes = require("./receipt");
 
 // Register view engine
 app.set("view engine", "ejs");
@@ -32,6 +33,7 @@ app.use(
 app.use("/api", cartRoutes);
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", receiptRoutes);
 
 // Main routes
 app.get("/", (req, res) => {

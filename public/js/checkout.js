@@ -366,6 +366,12 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const data = await response.json();
+
+      // Send email receipt after successful order processing
+      if (data.success) {
+        await sendOrderReceiptEmail(orderData);
+      }
+
       return {
         success: true,
         orderId: data.orderId,
@@ -378,6 +384,59 @@ document.addEventListener("DOMContentLoaded", function () {
         message:
           error.message || "Failed to process your order. Please try again.",
       };
+    }
+  }
+
+  // Send order receipt email
+  async function sendOrderReceiptEmail(orderData) {
+    try {
+      console.log("🛒 Sending receipt email for order:", orderData.id);
+      console.log("🛒 Customer email:", orderData.customer.email);
+
+      const emailData = {
+        orderId: orderData.id,
+        customerEmail: orderData.customer.email,
+        customerName: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
+        orderItems: orderData.items,
+        orderTotals: orderData.totals,
+        orderDate: orderData.date,
+        shippingAddress: {
+          address: orderData.customer.address,
+          city: orderData.customer.city,
+          postalCode: orderData.customer.postalCode,
+          country: orderData.customer.country,
+        },
+      };
+
+      console.log(
+        "🛒 Email data being sent:",
+        JSON.stringify(emailData, null, 2)
+      );
+
+      const response = await fetch("/api/send-receipt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emailData),
+      });
+
+      console.log("🛒 API response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("🛒 Error sending receipt:", errorData.message);
+        // We don't want to fail the order if only the email fails
+        return { success: false };
+      }
+
+      const data = await response.json();
+      console.log("🛒 Receipt email result:", data);
+      return { success: true };
+    } catch (error) {
+      console.error("🛒 Error sending receipt email:", error);
+      // We don't want to fail the order if only the email fails
+      return { success: false };
     }
   }
 
