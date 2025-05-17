@@ -6,6 +6,48 @@ const multer = require("multer");
 const path = require("path");
 const session = require("express-session");
 const nodemailer = require("nodemailer");
+const cookieParser = require("cookie-parser");
+// Removed csrf require
+
+// SECURITY: Add helmet for setting secure HTTP headers
+const helmet = require("helmet");
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        // Allow inline scripts and styles for convenience (consider removing for production)
+        "script-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdnjs.cloudflare.com",
+        ],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdnjs.cloudflare.com",
+        ],
+      },
+    },
+  })
+);
+
+// SECURITY: Add rate limiting to prevent brute force attacks
+const rateLimit = require("express-rate-limit");
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per window
+  message: "Too many login attempts, please try again after 15 minutes",
+});
+
+// SECURITY: Add CORS configuration to restrict which domains can access your API
+const cors = require("cors");
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "*", // In production, replace with your actual domain
+    credentials: true, // Allow cookies to be sent with requests
+  })
+);
 
 // Import the routes
 const cartRoutes = require("./cartRoutes");
@@ -19,23 +61,35 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Log in sessions
+// SECURITY: Improved session configuration
+// First, set up cookieParser with your session secret
+const sessionSecret = process.env.SESSION_SECRET || "your-fallback-secret";
+app.use(cookieParser(sessionSecret));
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "your-secret-key", // Fallback for development
+    secret: sessionSecret,
     resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 24 hours
+    saveUninitialized: false, // Changed to false to comply with GDPR
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      httpOnly: true, // SECURITY: Prevents JavaScript access to cookies
+      sameSite: "lax", // SECURITY: Provides some CSRF protection
+      // Enable the secure flag in production (requires HTTPS)
+      secure: process.env.NODE_ENV === "production",
+    },
   })
 );
-
 // Use the routes
 app.use("/api", cartRoutes);
+
+// Apply rate limiting to auth routes
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", receiptRoutes);
 
-// Main routes
 app.get("/", (req, res) => {
   connection.query("SELECT * FROM products", (err, results) => {
     if (err) {
@@ -246,10 +300,42 @@ app.get("/profile", (req, res) => {
 
 // Show admin login page
 app.get("/admin/login", (req, res) => {
-  res.render("admin-login", { title: "Admin Login" });
+  res.render("admin-login", {
+    title: "Admin Login",
+  });
 });
 
-// Admin dashboard page
+app.post("/admin/login", authLimiter, (req, res) => {
+  const { username, password } = req.body;
+
+  // SECURITY: Use constant-time comparison to prevent timing attacks
+  const safeCompare = (a, b) => {
+    if (typeof a !== "string" || typeof b !== "string") {
+      return false;
+    }
+
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+      result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return result === 0;
+  };
+
+  if (
+    safeCompare(username, process.env.ADMIN_USERNAME) &&
+    safeCompare(password, process.env.ADMIN_PASSWORD)
+  ) {
+    req.session.loggedIn = true;
+    res.redirect("/admin/dashboard");
+  } else {
+    res.send("Invalid username or password");
+  }
+});
+
 app.get("/admin/dashboard", (req, res) => {
   if (!req.session.loggedIn) {
     return res.redirect("/admin/login");
@@ -287,7 +373,12 @@ app.get("/admin/orders", (req, res) => {
 });
 
 app.get("/admin/dashboard/products", (req, res) => {
-  res.render("admin-dashboard-products", { title: "Admin products" });
+  if (!req.session.loggedIn) {
+    return res.redirect("/admin/login");
+  }
+  res.render("admin-dashboard-products", {
+    title: "Admin products",
+  });
 });
 
 // Admin logout
@@ -300,37 +391,46 @@ app.get("/admin/logout", (req, res) => {
   });
 });
 
-// Admin login route
-app.post("/admin/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (
-    username === process.env.ADMIN_USERNAME &&
-    password === process.env.ADMIN_PASSWORD
-  ) {
-    req.session.loggedIn = true;
-    res.redirect("/admin/dashboard");
-  } else {
-    res.send("Invalid username or password");
-  }
-});
-
 // Set up file storage using multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/images"); // Upload images to 'public/images' folder
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // Get file extension
+    // SECURITY: Sanitize filenames to prevent directory traversal attacks
+    const sanitizedFilename = path
+      .basename(file.originalname)
+      .replace(/[^a-zA-Z0-9_.-]/g, "_");
+    const ext = path.extname(sanitizedFilename); // Get file extension
     cb(null, Date.now() + ext); // Use current timestamp as filename
   },
 });
 
-// Initialize multer with storage configuration
-const upload = multer({ storage });
+// SECURITY: Add file validation to multer
+const fileFilter = (req, file, cb) => {
+  // Accept only image files
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed!"), false);
+  }
+};
+
+// Initialize multer with storage configuration and file filter
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
+  },
+});
 
 // Handle product image upload and saving new product to the database
 app.post("/admin/products/add", upload.single("image"), (req, res) => {
+  if (!req.session.loggedIn) {
+    return res.status(403).send("Unauthorized");
+  }
+
   const { name, price, category, stock, description } = req.body;
   const image = req.file ? req.file.filename : null;
 
@@ -349,8 +449,12 @@ app.post("/admin/products/add", upload.single("image"), (req, res) => {
   });
 });
 
-// Handle product deletion
-app.delete("/admin/products/delete/:id", (req, res) => {
+app.post("/admin/products/delete/:id", (req, res) => {
+  // SECURITY: Check admin authentication
+  if (!req.session.loggedIn) {
+    return res.status(403).send("Unauthorized");
+  }
+
   const productId = req.params.id;
 
   connection.query(
@@ -386,30 +490,45 @@ app.get("/products", (req, res) => {
   });
 });
 
-// contact email nodemailer
-app.post("/contact", (req, res) => {
-  console.log("Contact form submission received:", req.body);
+// SECURITY: Add input validation for contact form
+const { check, validationResult } = require("express-validator");
 
-  // Check if required fields are present
-  if (!req.body.name || !req.body.email || !req.body.message) {
-    console.log("Missing required fields in form submission");
-    return res.send("error");
-  }
+// Contact form with validation
+app.post(
+  "/contact",
+  [
+    check("name").trim().notEmpty().withMessage("Name is required"),
+    check("email").isEmail().withMessage("Valid email is required"),
+    check("message").trim().notEmpty().withMessage("Message is required"),
+    // Sanitize inputs
+    check("name").escape(),
+    check("email").normalizeEmail(),
+    check("subject").escape(),
+    check("message").escape(),
+  ],
+  (req, res) => {
+    console.log("Contact form submission received:", req.body);
 
-  // Create nodemailer transporter
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).send("Invalid form data");
+    }
 
-  const mailOptions = {
-    from: `"Aurora Home" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER, // Your email as the receiver
-    subject: `Message from ${req.body.name} (${req.body.email}): ${req.body.subject}`,
-    text: `
+    // Create nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Aurora Home" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER, // Your email as the receiver
+      subject: `Message from ${req.body.name} (${req.body.email}): ${req.body.subject}`,
+      text: `
 Name: ${req.body.name}
 Email: ${req.body.email}
 Subject: ${req.body.subject}
@@ -417,20 +536,21 @@ Subject: ${req.body.subject}
 Message:
 ${req.body.message}
     `,
-    replyTo: req.body.email, // This lets you reply directly to the sender
-  };
+      replyTo: req.body.email, // This lets you reply directly to the sender
+    };
 
-  // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Email sending error:", error);
-      res.send("error");
-    } else {
-      console.log("Email sent successfully:", info.response);
-      res.send("success");
-    }
-  });
-});
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Email sending error:", error);
+        res.send("error");
+      } else {
+        console.log("Email sent successfully:", info.response);
+        res.send("success");
+      }
+    });
+  }
+);
 
 // API endpoint to fetch product image
 app.get("/api/product-image/:id", (req, res) => {
@@ -460,22 +580,6 @@ app.get("/api/product-image/:id", (req, res) => {
   );
 });
 
-app.get("/profile", (req, res) => {
-  // Redirect to login if not authenticated
-  if (!req.session.userId) {
-    return res.redirect("/login?redirect=/profile");
-  }
-
-  // Just render the template - data will be loaded via API
-  res.render("profile", {
-    title: "My Profile",
-    user: {
-      name: req.session.name,
-      id: req.session.userId,
-    },
-  });
-});
-
 app.get("/logout", (req, res) => {
   // Destroy the session to log the user out
   req.session.destroy((err) => {
@@ -486,6 +590,14 @@ app.get("/logout", (req, res) => {
     // Redirect to home page after successful logout
     res.redirect("/");
   });
+});
+
+// SECURITY: Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  // Don't expose error details to users
+  res.status(500).send("Something went wrong. Please try again later.");
 });
 
 app.listen(PORT, () => {
